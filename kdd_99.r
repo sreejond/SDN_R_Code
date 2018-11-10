@@ -45,7 +45,8 @@ barplot(beside = TRUE, log10(sum_label$count),
 
 
 # convert symbolic values to continuous values
-train_raw$protocol_type = as.numeric(factor(train_raw$protocol_type))
+train_raw$protocol_type = factor(train_raw$protocol_type)
+#train_raw$protocol_type = as.numeric(factor(train_raw$protocol_type))
 train_raw$service = factor(train_raw$service)
 train_raw$flag = factor(train_raw$flag)
 #train_raw$service = as.numeric(factor(train_raw$service))
@@ -95,13 +96,59 @@ train_raw$label = factor(train_raw$label)
 
 #cor(train_raw)
 # corelation between label vs all other predictors
-#cor(train_raw$label,train_raw)
+#cor(train_raw$label, train_raw)
 
 
 
 
 
 # Exploratory Analysis
-#qplot(dst_host_same_src_port_rate,dst_host_srv_diff_host_rate,colour=label,data=train_raw)
-qplot(service,flag,colour=label,data=train_raw)
+
+# Observation: dst_host_same_src_port_rate has slight effect on the intrusion type.
+# for "dst_host_same_src_port_rate" value greater than equal to 1 it can be "probe" and "r2l""
+#qplot(dst_host_same_src_port_rate, dst_host_srv_diff_host_rate, colour=label, data=train_raw)
+
+
+
+# Observation: "flag" is a strong predictor. for flag= "REG" and "S0" it is "dos"
+#qplot(service, flag, colour=label, data=train_raw)
+
+
+# Observation: For duration Greater than 30000 we can see it's 'probe'
+# Therefore duration itself is a strong predictor
+#qplot(duration, src_bytes, colour=label, data=train_raw) 
+
+
+
+# Observation: protocol-type "tcp" has "DOS" intrusion type. It is also a strong predictor of "dos" type.
+#qplot(service, protocol_type, colour=label, data=train_raw)
+
+
+
+# Observation: No such clear identification
+#qplot(flag, land, colour=label, data=train_raw)
+
+
+
+# Observation: For serror_rate and srv_serror_rate=0 or 1 its "dos" and
+# serror_rate between 0.25 to 0.5 its "probe""
+qplot(serror_rate, srv_serror_rate, colour=label, data=train_raw)
+
+
+
+# Observation:For duration Greater than 30000 we can see it's 'probe'
+#qplot(duration, src_bytes, colour=label, data=train_raw)
+
+
+
+A=table(train_raw$flag,train_raw$label)
+round(prop.table(A)*100,1)
+
+
+
+
+
+
+
+
 #sink()
