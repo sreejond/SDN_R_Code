@@ -1,3 +1,5 @@
+setwd("C:/Users/sreej/Desktop/SDN/SDN_R_Code")
+
 # install packages
 # install.packages("ggplot2")
 
@@ -51,10 +53,16 @@ train_raw$service = factor(train_raw$service)
 train_raw$flag = factor(train_raw$flag)
 #train_raw$service = as.numeric(factor(train_raw$service))
 #train_raw$flag = as.numeric(factor(train_raw$flag))
-train_raw$land = as.numeric(factor(train_raw$land))
-train_raw$logged_in = as.numeric(factor(train_raw$logged_in))
-train_raw$is_host_login = as.numeric(factor(train_raw$is_host_login))
-train_raw$is_guest_login = as.numeric(factor(train_raw$is_guest_login))
+train_raw$land = factor(train_raw$land)
+#train_raw$land = as.numeric(factor(train_raw$land))
+train_raw$logged_in = factor(train_raw$logged_in)
+#train_raw$logged_in = as.numeric(factor(train_raw$logged_in))
+train_raw$root_shell = factor(train_raw$root_shell)
+train_raw$su_attempted = factor(train_raw$su_attempted)
+train_raw$is_host_login = factor(train_raw$is_host_login)
+train_raw$is_guest_login = factor(train_raw$is_guest_login)
+#train_raw$is_host_login = as.numeric(factor(train_raw$is_host_login))
+#train_raw$is_guest_login = as.numeric(factor(train_raw$is_guest_login))
 
 
 
@@ -132,7 +140,7 @@ train_raw$label = factor(train_raw$label)
 
 # Observation: For serror_rate and srv_serror_rate=0 or 1 its "dos" and
 # serror_rate between 0.25 to 0.5 its "probe""
-qplot(serror_rate, srv_serror_rate, colour=label, data=train_raw)
+#qplot(serror_rate, srv_serror_rate, colour=label, data=train_raw)
 
 
 
@@ -147,8 +155,32 @@ round(prop.table(A)*100,1)
 
 
 
+# Feature Selection by using RFE and Boruta function
+sample_train=train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
+library(Boruta)
+boruta.train <- Boruta(label ~ .-service, data = sample_train, doTrace = 2, maxRuns=25)
+print(boruta.train)
+plot(boruta.train)
+boruta.train$finalDecision
 
 
+#take a call on tentative features
+boruta.bank <- TentativeRoughFix(boruta.train)
+print(boruta.bank)
+
+# plot with all the feature names written properly
+plot(boruta.bank, xlab = "", xaxt = "n")
+lz<-lapply(1:ncol(boruta.bank$ImpHistory),function(i)
+  boruta.bank$ImpHistory[is.finite(boruta.bank$ImpHistory[,i]),i])
+names(lz) <- colnames(boruta.bank$ImpHistory)
+Labels <- sort(sapply(lz,median))
+axis(side = 1,las=2,labels = names(Labels),
+     at = 1:ncol(boruta.bank$ImpHistory), cex.axis = 0.7)
+
+
+getSelectedAttributes(boruta.bank, withTentative = F)
+bank_df <- attStats(boruta.bank)
+print(bank_df)
 
 
 #sink()
