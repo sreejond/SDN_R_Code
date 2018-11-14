@@ -155,7 +155,7 @@ round(prop.table(A)*100,1)
 
 
 
-# Feature Selection by using RFE and Boruta function
+# Feature Selection by using Boruta function
 sample_train=train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
 library(Boruta)
 boruta.train <- Boruta(label ~ .-service, data = sample_train, doTrace = 2, maxRuns=25)
