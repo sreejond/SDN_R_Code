@@ -2,6 +2,11 @@ setwd("C:/Users/sreej/Desktop/SDN/SDN_R_Code")
 
 # install packages
 # install.packages("ggplot2")
+# install.packages("Boruta")
+# install.packages("caret", dependencies = c("Depends", "Suggests"))
+# install.packages("NMF")
+# install.packages("BiocManager")
+# BiocManager::install("phyloseq", version = "3.8")
 
 
 
@@ -158,7 +163,7 @@ round(prop.table(A)*100,1)
 # Feature Selection by using Boruta function
 sample_train=train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
 library(Boruta)
-boruta.train <- Boruta(label ~ .-service, data = sample_train, doTrace = 2, maxRuns=25)
+boruta.train <- Boruta(label ~ ., data = sample_train, doTrace = 2, maxRuns=25)
 print(boruta.train)
 plot(boruta.train)
 boruta.train$finalDecision
@@ -181,6 +186,22 @@ axis(side = 1,las=2,labels = names(Labels),
 getSelectedAttributes(boruta.bank, withTentative = F)
 bank_df <- attStats(boruta.bank)
 print(bank_df)
+
+
+
+
+
+
+# Feature Selection by using RFE function
+library("caret")
+library(randomForest)
+control <- rfeControl(functions=rfFuncs, method="cv", number=10)
+rfe.train <- rfe(sample_train[,c(1,2,4:41)], sample_train[,42], sizes=1:25, rfeControl=control)
+rfe.train
+plot(rfe.train, type=c("g", "o"), cex = 1.0, col = 1:11)
+predictors(rfe.train)
+
+
 
 
 #sink()
