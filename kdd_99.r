@@ -161,31 +161,31 @@ round(prop.table(A)*100,1)
 
 
 # Feature Selection by using Boruta function
-sample_train=train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
-library(Boruta)
-boruta.train <- Boruta(label ~ ., data = train_raw, doTrace = 2, maxRuns=100)
-print(boruta.train)
-plot(boruta.train)
-boruta.train$finalDecision
-
-
-#take a call on tentative features
-boruta.bank <- TentativeRoughFix(boruta.train)
-print(boruta.bank)
-
-# plot with all the feature names written properly
-plot(boruta.bank, xlab = "", xaxt = "n")
-lz<-lapply(1:ncol(boruta.bank$ImpHistory),function(i)
-  boruta.bank$ImpHistory[is.finite(boruta.bank$ImpHistory[,i]),i])
-names(lz) <- colnames(boruta.bank$ImpHistory)
-Labels <- sort(sapply(lz,median))
-axis(side = 1,las=2,labels = names(Labels),
-     at = 1:ncol(boruta.bank$ImpHistory), cex.axis = 0.7)
-
-
-getSelectedAttributes(boruta.bank, withTentative = F)
-bank_df <- attStats(boruta.bank)
-print(bank_df)
+# sample_train=train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
+# library(Boruta)
+# boruta.train <- Boruta(label ~ ., data = train_raw, doTrace = 2, maxRuns=100)
+# print(boruta.train)
+# plot(boruta.train)
+# boruta.train$finalDecision
+# 
+# 
+# #take a call on tentative features
+# boruta.bank <- TentativeRoughFix(boruta.train)
+# print(boruta.bank)
+# 
+# # plot with all the feature names written properly
+# plot(boruta.bank, xlab = "", xaxt = "n")
+# lz<-lapply(1:ncol(boruta.bank$ImpHistory),function(i)
+#   boruta.bank$ImpHistory[is.finite(boruta.bank$ImpHistory[,i]),i])
+# names(lz) <- colnames(boruta.bank$ImpHistory)
+# Labels <- sort(sapply(lz,median))
+# axis(side = 1,las=2,labels = names(Labels),
+#      at = 1:ncol(boruta.bank$ImpHistory), cex.axis = 0.7)
+# 
+# 
+# getSelectedAttributes(boruta.bank, withTentative = F)
+# bank_df <- attStats(boruta.bank)
+# print(bank_df)
 # 
 # 
 # 
@@ -193,13 +193,13 @@ print(bank_df)
 # 
 # 
 # # Feature Selection by using RFE function
-# library("caret")
-# library(randomForest)
-# control <- rfeControl(functions=rfFuncs, method="cv", number=10)
-# rfe.train <- rfe(sample_train[,c(1,2,4:41)], sample_train[,42], sizes=1:25, rfeControl=control)
-# rfe.train
-# plot(rfe.train, type=c("g", "o"), cex = 1.0, col = 1:11)
-# predictors(rfe.train)
+library("caret")
+library(randomForest)
+control <- rfeControl(functions=rfFuncs, method="cv", number=10)
+rfe.train <- rfe(train_raw[,c(1,2,4:41)], train_raw[,42], sizes=1:25, rfeControl=control)
+rfe.train
+plot(rfe.train, type=c("g", "o"), cex = 1.0, col = 1:11)
+predictors(rfe.train)
 
 
 
