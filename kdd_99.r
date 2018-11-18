@@ -195,11 +195,51 @@ round(prop.table(A)*100,1)
 # # Feature Selection by using RFE function
 library("caret")
 library(randomForest)
-control <- rfeControl(functions=rfFuncs, method="cv", number=10)
-rfe.train <- rfe(train_raw[,c(1,2,4:41)], train_raw[,42], sizes=1:25, rfeControl=control)
-rfe.train
-plot(rfe.train, type=c("g", "o"), cex = 1.0, col = 1:11)
-predictors(rfe.train)
+# control <- rfeControl(functions=rfFuncs, method="cv", number=10)
+# rfe.train <- rfe(train_raw[,c(1,2,4:41)], train_raw[,42], sizes=1:25, rfeControl=control)
+# rfe.train
+# plot(rfe.train, type=c("g", "o"), cex = 1.0, col = 1:11)
+# predictors(rfe.train)
+
+
+
+
+
+# Create final training data with the important features
+#sample_train=train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
+
+train_raw_imp_features <- train_raw[, c("srv_rerror_rate", "rerror_rate", "flag", "dst_host_rerror_rate" ,  
+               "logged_in", "dst_bytes", "src_bytes", "num_compromised",           
+               "dst_host_srv_count", "duration", "dst_host_same_src_port_rate", "dst_host_diff_srv_rate",   
+               "dst_host_count", "dst_host_srv_serror_rate", "count", "hot" ,                      
+               "dst_host_same_srv_rate", "dst_host_srv_diff_host_rate", "dst_host_serror_rate", "serror_rate",                
+               "srv_serror_rate", "diff_srv_rate", "srv_count", "srv_diff_host_rate", "protocol_type", "label" )] 
+
+inTrain <- createDataPartition(y = train_raw_imp_features$label, p = 0.5, list = FALSE)
+final_subset_train <- train_raw_imp_features[inTrain,]
+final_subset_test <- train_raw_imp_features[-inTrain,]
+dim(final_subset_train)
+dim(final_subset_test)
+
+
+
+
+# Apply random forest
+rfModelFit <- train(label ~ ., method = "rf", data = final_subset_train)
+rfModelFit
+
+
+getTree(rfModelFit$finalModel, k = 2)
+
+
+
+
+pred <- predict(rfModelFit, final_subset_test); 
+final_subset_test$predRight <- pred == final_subset_test$label
+A = table(pred, final_subset_test$label)
+A
+round(prop.table(A,1)*100, 2)
+
 
 
 
