@@ -221,7 +221,7 @@ train_raw_imp_features <- train_raw[, c("flag", "dst_host_rerror_rate", "logged_
                                         "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
                                         "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
                                         "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
-                                        "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count" )] 
+                                        "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", "label" )] 
 
 inTrain <- createDataPartition(y = train_raw_imp_features$label, p = 0.5, list = FALSE)
 final_subset_train <- train_raw_imp_features[inTrain,]
