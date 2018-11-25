@@ -24,7 +24,7 @@ library(ggplot2)
 # Clear the workspace
 rm(list = ls())
 
-# Load the data 
+# Load training data 
 train_raw = read.csv("dataset/kddcup.data_10_percent_corrected.csv", stringsAsFactors = FALSE)
 
 # Process the data
@@ -41,6 +41,7 @@ names(train_raw)
 
 
 # Observe the distribution of labels
+rm(sum_label)
 sum_label <- aggregate(rep(1, d[1]), by = list(train_raw$label), FUN = sum)
 names(sum_label) <- c("label", "count")
 barplot(beside = TRUE, log10(sum_label$count), 
@@ -102,6 +103,115 @@ train_raw$label[train_raw$label == "normal."] = "normal"
 train_raw$label = factor(train_raw$label)
 #train_raw$label = as.numeric(factor(train_raw$label))
 
+
+
+
+
+# Observe the distribution of labels
+sum_label <- aggregate(rep(1, d[1]), by = list(train_raw$label), FUN = sum)
+names(sum_label) <- c("label", "count")
+barplot(beside = TRUE, (sum_label$count), 
+        names.arg = sum_label$label, ylim = c(0,max(sum_label$count)),
+        xlab = "Label", ylab = "Count",
+        col = "Blue", main = "The distribution of labels")
+
+
+
+
+
+# Load testing data 
+test_raw = read.csv("dataset/corrected.csv", stringsAsFactors = FALSE)
+
+# Process the data
+colnames = read.table("dataset/kddcup.names.txt", skip = 1, sep = ":")
+names(test_raw) = colnames$V1
+d = dim(test_raw)
+names(test_raw)[d[2]] = "label"
+
+# Observe the data
+names(test_raw)
+
+
+
+
+
+# Observe the distribution of labels
+sum_label <- aggregate(rep(1, d[1]), by = list(test_raw$label), FUN = sum)
+names(sum_label) <- c("label", "count")
+barplot(beside = TRUE, log10(sum_label$count), 
+        names.arg = sum_label$label, ylim = c(0,6),
+        xlab = "Label", ylab = "log(Count)",
+        col = "Blue", main = "The distribution of labels")
+
+
+
+
+
+# convert symbolic values to continuous values
+test_raw$protocol_type = factor(test_raw$protocol_type)
+#test_raw$protocol_type = as.numeric(factor(test_raw$protocol_type))
+test_raw$service = factor(test_raw$service)
+test_raw$flag = factor(test_raw$flag)
+#test_raw$service = as.numeric(factor(test_raw$service))
+#test_raw$flag = as.numeric(factor(test_raw$flag))
+test_raw$land = factor(test_raw$land)
+#test_raw$land = as.numeric(factor(test_raw$land))
+test_raw$logged_in = factor(test_raw$logged_in)
+#test_raw$logged_in = as.numeric(factor(test_raw$logged_in))
+test_raw$root_shell = factor(test_raw$root_shell)
+test_raw$su_attempted = factor(test_raw$su_attempted)
+test_raw$is_host_login = factor(test_raw$is_host_login)
+test_raw$is_guest_login = factor(test_raw$is_guest_login)
+#test_raw$is_host_login = as.numeric(factor(test_raw$is_host_login))
+#test_raw$is_guest_login = as.numeric(factor(test_raw$is_guest_login))
+
+
+
+
+
+# label preprocess
+# The result is classified into 4 groups 
+# Subsetting the label variable into 4 groups.
+test_raw$label[test_raw$label == "ipsweep."] = "probe"
+test_raw$label[test_raw$label == "portsweep."] = "probe"
+test_raw$label[test_raw$label == "nmap."] = "probe"
+test_raw$label[test_raw$label == "satan."] = "probe"
+test_raw$label[test_raw$label == "mscan."] = "probe"
+test_raw$label[test_raw$label == "saint."] = "probe"
+test_raw$label[test_raw$label == "buffer_overflow."] = "u2r"
+test_raw$label[test_raw$label == "loadmodule."] = "u2r"
+test_raw$label[test_raw$label == "perl."] = "u2r"
+test_raw$label[test_raw$label == "rootkit."] = "u2r"
+test_raw$label[test_raw$label == "httptunnel."] = "u2r"
+test_raw$label[test_raw$label == "ps."] = "u2r"
+test_raw$label[test_raw$label == "sqlattack."] = "u2r"
+test_raw$label[test_raw$label == "xterm."] = "u2r"
+test_raw$label[test_raw$label == "back."] = "dos"
+test_raw$label[test_raw$label == "land."] = "dos"
+test_raw$label[test_raw$label == "neptune."] = "dos"
+test_raw$label[test_raw$label == "pod."] = "dos"
+test_raw$label[test_raw$label == "smurf."] = "dos"
+test_raw$label[test_raw$label == "teardrop."] = "dos"
+test_raw$label[test_raw$label == "apache2."] = "dos"
+test_raw$label[test_raw$label == "mailbomb."] = "dos"
+test_raw$label[test_raw$label == "processtable."] = "dos"
+test_raw$label[test_raw$label == "ftp_write."] = "r2l"
+test_raw$label[test_raw$label == "guess_passwd."] = "r2l"
+test_raw$label[test_raw$label == "imap."] = "r2l"
+test_raw$label[test_raw$label == "multihop."] = "r2l"
+test_raw$label[test_raw$label == "phf."] = "r2l"
+test_raw$label[test_raw$label == "spy."] = "r2l"
+test_raw$label[test_raw$label == "warezclient."] = "r2l"
+test_raw$label[test_raw$label == "sendmail."] = "r2l"
+test_raw$label[test_raw$label == "named."] = "r2l"
+test_raw$label[test_raw$label == "snmpgetattack."] = "r2l"
+test_raw$label[test_raw$label == "snmpguess."] = "r2l"
+test_raw$label[test_raw$label == "xlock."] = "r2l"
+test_raw$label[test_raw$label == "xsnoop."] = "r2l"
+test_raw$label[test_raw$label == "worm."] = "r2l"
+test_raw$label[test_raw$label == "normal."] = "normal"
+test_raw$label = factor(test_raw$label)
+#test_raw$label = as.numeric(factor(test_raw$label))
 
 
 
@@ -206,7 +316,8 @@ library(randomForest)
 
 
 # Create final training data with the important features
-#sample_train=train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
+sample_train = train_raw[sample(nrow(train_raw), replace=F, size=0.05*nrow(train_raw)), ]
+sample_test = test_raw[sample(nrow(test_raw), replace=F, size=0.05*nrow(test_raw)), ]
 
 # selected 25 features
 # train_raw_imp_features <- train_raw[, c("srv_rerror_rate", "rerror_rate", "flag", "dst_host_rerror_rate" ,  
@@ -217,15 +328,23 @@ library(randomForest)
 #                "srv_serror_rate", "diff_srv_rate", "srv_count", "srv_diff_host_rate", "protocol_type", "label" )] 
 
 # selected 19 features
-train_raw_imp_features <- train_raw[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
+train_raw_imp_features <- sample_train[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
                                         "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
                                         "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
                                         "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
                                         "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", "label" )] 
 
+test_raw_imp_features <- sample_test[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
+                                           "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
+                                           "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
+                                           "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
+                                           "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", "label" )] 
+
 inTrain <- createDataPartition(y = train_raw_imp_features$label, p = 0.5, list = FALSE)
+inTest <- createDataPartition(y = test_raw_imp_features$label, p = 0.5, list = FALSE)
+
 final_subset_train <- train_raw_imp_features[inTrain,]
-final_subset_test <- train_raw_imp_features[-inTrain,]
+final_subset_test <- test_raw_imp_features[inTest,]
 dim(final_subset_train)
 dim(final_subset_test)
 
@@ -234,6 +353,7 @@ dim(final_subset_test)
 
 # Apply random forest
 rfModelFit <- train(label ~ ., method = "rf", data = final_subset_train)
+saveRDS(object = rfModelFit, file = "rfModelFitFile_on_50_test_set.rds")
 rfModelFit
 
 
@@ -252,4 +372,33 @@ round(prop.table(A,1)*100, 2)
 
 
 
+# plotting learning curve
+# library(reshape2)
+# results = data.frame()
+# for (i in 1 : 34) 
+# {
+#   partial_train_set <- final_subset_train[1 : (350 * i),]
+#   
+#   fitModel <- train(label ~ ., method = "rf", data = partial_train_set)
+#   
+#   train_correct <- length(which(predict(fitModel, partial_train_set) == partial_train_set$label)) / nrow(partial_train_set)
+#   cv_correct <- length(which(predict(fitModel, final_subset_test) == final_subset_test$label)) / nrow(final_subset_test)
+#   
+#   # Record accuracy history.
+#   results <- rbind(results, c(train_correct, cv_correct))
+#   
+#   # Plot learning curve.
+#   names(results) <- c('Train', 'CV')
+#   r <- melt(results)
+#   r <- cbind(r, seq(from = 1000, to = nrow(results) * 1000, by = 1000))
+#   names(r) <- c('Set', 'Accuracy', 'Count')
+#   print(ggplot(data = r, aes(x = Count, y = Accuracy, colour = Set)) + geom_line() + geom_smooth(method = 'lm', se=F))
+# }
+
+
+
+
+
+# saveRDS(women, fil)
+# readRDS(fil)
 #sink()
