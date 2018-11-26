@@ -345,7 +345,8 @@ inTrain <- createDataPartition(y = train_raw_imp_features$label, p = 0.5, list =
 inTest <- createDataPartition(y = test_raw_imp_features$label, p = 0.5, list = FALSE)
 
 final_subset_train <- train_raw_imp_features[inTrain,]
-final_subset_test <- test_raw_imp_features[inTest,]
+# final_subset_test <- test_raw_imp_features[inTest,]
+final_subset_test <- test_raw_imp_features
 dim(final_subset_train)
 dim(final_subset_test)
 
