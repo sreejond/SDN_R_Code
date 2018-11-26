@@ -353,8 +353,9 @@ dim(final_subset_test)
 
 
 # Apply random forest
-rfModelFit <- train(label ~ ., method = "rf", data = final_subset_train)
-saveRDS(object = rfModelFit, file = "rfModelFitFile_on_50_test_set.rds")
+# rfModelFit <- train(label ~ ., method = "rf", data = final_subset_train)
+# saveRDS(object = rfModelFit, file = "rfModelFitFile_on_50_test_set.rds")
+rfModelFit = readRDS("rfModelFitFile_on_50_test_set.rds")
 rfModelFit
 
 
