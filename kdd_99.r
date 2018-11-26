@@ -336,15 +336,16 @@ train_raw_imp_features <- sample_train[, c("flag", "dst_host_rerror_rate", "logg
                                         "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", "label" )] 
 
 test_raw_imp_features <- sample_test[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
-                                           "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
-                                           "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
-                                           "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
-                                           "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", "label" )] 
+                                         "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
+                                         "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
+                                         "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
+                                         "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", "label" )] 
 
 inTrain <- createDataPartition(y = train_raw_imp_features$label, p = 0.5, list = FALSE)
 inTest <- createDataPartition(y = test_raw_imp_features$label, p = 0.5, list = FALSE)
 
-final_subset_train <- train_raw_imp_features[inTrain,]
+final_subset_train <- train_raw_imp_features
+# final_subset_train <- train_raw_imp_features[inTrain,]
 # final_subset_test <- test_raw_imp_features[inTest,]
 final_subset_test <- test_raw_imp_features
 dim(final_subset_train)
@@ -354,9 +355,9 @@ dim(final_subset_test)
 
 
 # Apply random forest
-# rfModelFit <- train(label ~ ., method = "rf", data = final_subset_train)
-# saveRDS(object = rfModelFit, file = "rfModelFitFile_on_50_test_set.rds")
-rfModelFit = readRDS("rfModelFitFile_on_50_test_set.rds")
+rfModelFit <- train(label ~ ., method = "rf", data = final_subset_train)
+saveRDS(object = rfModelFit, file = "rfModelFitFile_on_100_test_set.rds")
+#rfModelFit = readRDS("rfModelFitFile_on_50_test_set.rds")
 rfModelFit
 
 
