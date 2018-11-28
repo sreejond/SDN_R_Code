@@ -218,14 +218,28 @@ sample_test = test_raw_encoded[sample(nrow(test_raw_encoded), replace=F, size=0.
 
 
 # selected 19 features
-train_raw_imp_features <- sample_train[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
+# train_raw_imp_features <- sample_train[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
+#                                            "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
+#                                            "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
+#                                            "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
+#                                            "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count",
+#                                            "normal", "dos", "probe", "r2l", "u2r" )] 
+# 
+# test_raw_imp_features <- sample_test[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
+#                                          "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
+#                                          "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
+#                                          "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
+#                                          "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", 
+#                                          "normal", "dos", "probe", "r2l", "u2r" )] 
+
+train_raw_imp_features <- train_raw_encoded[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
                                            "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
                                            "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
                                            "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
                                            "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count",
                                            "normal", "dos", "probe", "r2l", "u2r" )] 
 
-test_raw_imp_features <- sample_test[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
+test_raw_imp_features <- test_raw_encoded[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
                                          "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
                                          "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
                                          "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
@@ -240,10 +254,10 @@ inTest <- createDataPartition(y = paste(test_raw_imp_features$normal, test_raw_i
                                         test_raw_imp_features$probe, test_raw_imp_features$r2l, 
                                         test_raw_imp_features$u2r), p = 0.5, list = FALSE)
 
-#final_subset_train <- train_raw_imp_features
-final_subset_train <- train_raw_imp_features[inTrain,]
-final_subset_test <- test_raw_imp_features[inTest,]
-#final_subset_test <- test_raw_imp_features
+# final_subset_train <- train_raw_imp_features[inTrain,]
+# final_subset_test <- test_raw_imp_features[inTest,]
+final_subset_train <- train_raw_imp_features
+final_subset_test <- test_raw_imp_features
 dim(final_subset_train)
 dim(final_subset_test)
 
@@ -268,7 +282,7 @@ plot(nn.model)
 
 
 # Compute predictions
-pr.nn <- compute(nn.model, final_subset_train[, 1:19])
+pr.nn <- compute(nn.model, final_subset_test[, 1:19])
 pr.nn
 
 results <- data.frame(pr.nn$net.result)
