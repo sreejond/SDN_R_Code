@@ -218,33 +218,33 @@ sample_test = test_raw_encoded[sample(nrow(test_raw_encoded), replace=F, size=0.
 
 
 # selected 19 features
-train_raw_imp_features <- sample_train[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes",
+# train_raw_imp_features <- sample_train[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes",
+#                                            "src_bytes", "num_compromised", "dst_host_srv_count", "duration",
+#                                            "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count",
+#                                            "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate",
+#                                            "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count",
+#                                            "normal", "dos", "probe", "r2l", "u2r" )]
+# 
+# test_raw_imp_features <- sample_test[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes",
+#                                          "src_bytes", "num_compromised", "dst_host_srv_count", "duration",
+#                                          "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count",
+#                                          "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate",
+#                                          "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count",
+#                                          "normal", "dos", "probe", "r2l", "u2r" )]
+
+train_raw_imp_features <- train_raw_encoded[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes",
                                            "src_bytes", "num_compromised", "dst_host_srv_count", "duration",
                                            "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count",
                                            "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate",
                                            "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count",
                                            "normal", "dos", "probe", "r2l", "u2r" )]
 
-test_raw_imp_features <- sample_test[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes",
+test_raw_imp_features <- test_raw_encoded[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes",
                                          "src_bytes", "num_compromised", "dst_host_srv_count", "duration",
                                          "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count",
                                          "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate",
                                          "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count",
                                          "normal", "dos", "probe", "r2l", "u2r" )]
-
-# train_raw_imp_features <- train_raw_encoded[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
-#                                            "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
-#                                            "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
-#                                            "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
-#                                            "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count",
-#                                            "normal", "dos", "probe", "r2l", "u2r" )] 
-# 
-# test_raw_imp_features <- test_raw_encoded[, c("flag", "dst_host_rerror_rate", "logged_in", "dst_bytes", 
-#                                          "src_bytes", "num_compromised", "dst_host_srv_count", "duration", 
-#                                          "dst_host_same_src_port_rate", "dst_host_diff_srv_rate", "dst_host_count", 
-#                                          "dst_host_srv_serror_rate", "count", "hot", "dst_host_same_srv_rate", 
-#                                          "dst_host_serror_rate", "protocol_type", "wrong_fragment", "srv_count", 
-#                                          "normal", "dos", "probe", "r2l", "u2r" )] 
 
 library("caret")
 inTrain <- createDataPartition(y = paste(train_raw_imp_features$normal, train_raw_imp_features$dos, 
@@ -254,10 +254,10 @@ inTest <- createDataPartition(y = paste(test_raw_imp_features$normal, test_raw_i
                                         test_raw_imp_features$probe, test_raw_imp_features$r2l, 
                                         test_raw_imp_features$u2r), p = 0.5, list = FALSE)
 
-final_subset_train <- train_raw_imp_features[inTrain,]
-final_subset_test <- test_raw_imp_features[inTest,]
-# final_subset_train <- train_raw_imp_features
-# final_subset_test <- test_raw_imp_features
+# final_subset_train <- train_raw_imp_features[inTrain,]
+# final_subset_test <- test_raw_imp_features[inTest,]
+final_subset_train <- train_raw_imp_features
+final_subset_test <- test_raw_imp_features
 dim(final_subset_train)
 dim(final_subset_test)
 
@@ -272,7 +272,7 @@ f <- as.formula(paste("normal + dos + probe + r2l + u2r ~",
                       paste(n[!n %in% c("normal", "dos", "probe", "r2l", "u2r")], collapse = " + ")))
 f
 
-nnModel <- neuralnet(formula = f, data = final_subset_train, hidden = c(2,1), linear.output = FALSE, threshold = 0.01)
+nnModel <- neuralnet(formula = f, data = final_subset_train, hidden = c(10, 5, 2), linear.output = FALSE, threshold = 0.01, stepmax = 1e+07)
 saveRDS(object = nnModel, file = "nnModel_on_100_test_set.rds")
 #rfModelFit = readRDS("rfModelFitFile_on_50_test_set.rds")
 nnModel$result.matrix
@@ -311,32 +311,32 @@ mean(predictedResults == actualResults)
 
 
 
-# cross validation
-# 10 fold cross validation
-k <- 10
-# Results from cv
-outs <- NULL
-# Train test split proportions
-proportion <- 0.50 
-
-# Crossvalidate, go!
-for(i in 1:k)
-{
-  index <- sample(1:nrow(final_subset_train), round(proportion*nrow(final_subset_train)))
-  train_cv <- final_subset_train[index, ]
-  index <- sample(1:nrow(final_subset_test), round(proportion*nrow(final_subset_test)))
-  test_cv <- final_subset_test[index, ]
-  nn_cv <- neuralnet(formula = f, data = train_cv, hidden = c(2,1), linear.output = FALSE, threshold = 0.01)
-  
-  # Compute predictions
-  pr.nn <- compute(nn_cv, test_cv[, 1:19])
-  # Extract results
-  pr.nn_ <- pr.nn$net.result
-  # Accuracy (test set)
-  original_values <- max.col(test_cv[, 20:24])
-  pr.nn_2 <- max.col(pr.nn_)
-  outs[i] <- mean(pr.nn_2 == original_values)
-}
-
-# accuracy of cv
-mean(outs)
+# # cross validation
+# # 10 fold cross validation
+# k <- 10
+# # Results from cv
+# outs <- NULL
+# # Train test split proportions
+# proportion <- 0.50 
+# 
+# # Crossvalidate, go!
+# for(i in 1:k)
+# {
+#   index <- sample(1:nrow(final_subset_train), round(proportion*nrow(final_subset_train)))
+#   train_cv <- final_subset_train[index, ]
+#   index <- sample(1:nrow(final_subset_test), round(proportion*nrow(final_subset_test)))
+#   test_cv <- final_subset_test[index, ]
+#   nn_cv <- neuralnet(formula = f, data = train_cv, hidden = c(2,1), linear.output = FALSE, threshold = 0.01)
+#   
+#   # Compute predictions
+#   pr.nn <- compute(nn_cv, test_cv[, 1:19])
+#   # Extract results
+#   pr.nn_ <- pr.nn$net.result
+#   # Accuracy (test set)
+#   original_values <- max.col(test_cv[, 20:24])
+#   pr.nn_2 <- max.col(pr.nn_)
+#   outs[i] <- mean(pr.nn_2 == original_values)
+# }
+# 
+# # accuracy of cv
+# mean(outs)
