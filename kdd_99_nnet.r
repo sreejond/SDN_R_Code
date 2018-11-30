@@ -272,7 +272,7 @@ f <- as.formula(paste("normal + dos + probe + r2l + u2r ~",
                       paste(n[!n %in% c("normal", "dos", "probe", "r2l", "u2r")], collapse = " + ")))
 f
 
-nnModel <- neuralnet(formula = f, data = final_subset_train, hidden = c(10, 5, 2), linear.output = FALSE, threshold = 0.01, stepmax = 1e+07)
+nnModel <- neuralnet(formula = f, data = final_subset_train, hidden = c(10, 5, 3, 2), linear.output = FALSE, threshold = 0.01, stepmax = 1e+07)
 saveRDS(object = nnModel, file = "nnModel_on_100_test_set.rds")
 #rfModelFit = readRDS("rfModelFitFile_on_50_test_set.rds")
 nnModel$result.matrix
