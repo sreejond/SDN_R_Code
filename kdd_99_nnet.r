@@ -265,7 +265,7 @@ dim(final_subset_test)
 
 
 
-# library(neuralnet)
+library(neuralnet)
 # 
 # n <- names(final_subset_train)
 # f <- as.formula(paste("normal + dos + probe + r2l + u2r ~", 
