@@ -265,78 +265,78 @@ dim(final_subset_test)
 
 
 
-library(neuralnet)
-
-n <- names(final_subset_train)
-f <- as.formula(paste("normal + dos + probe + r2l + u2r ~", 
-                      paste(n[!n %in% c("normal", "dos", "probe", "r2l", "u2r")], collapse = " + ")))
-f
-
-nnModel <- neuralnet(formula = f, data = final_subset_train, hidden = c(10, 5, 3, 2), linear.output = FALSE, threshold = 0.01, stepmax = 1e+07)
-saveRDS(object = nnModel, file = "nnModel_on_100_test_set.rds")
-#rfModelFit = readRDS("rfModelFitFile_on_50_test_set.rds")
-nnModel$result.matrix
-plot(nnModel)
-
-
-
-
-
-
-# Compute predictions
-pr.nn <- compute(nnModel, final_subset_test[, 1:19])
-pr.nn
-
-results <- data.frame(pr.nn$net.result)
-names(results) = c("normal", "dos", "probe", "r2l", "u2r")
-
-roundedresults <- sapply(results, round, digits = 0)
-roundedresultsdf = data.frame(roundedresults)
-
-predictedResults = cbind(1:nrow(roundedresultsdf), max.col(roundedresultsdf))
-predictedResults = predictedResults[,2]
-actualResults = cbind(1:nrow(final_subset_test[, 20:24]), max.col(final_subset_test[, 20:24]))
-actualResults = actualResults[,2]
-
-# confustion matrix
-confusion_matrix = table(predictedResults, actualResults)
-confusion_matrix
-round(prop.table(confusion_matrix, 1) * 100, 2)
-
-
-# accuracy on testing set
-mean(predictedResults == actualResults)
-
-
-
-
-
-# # cross validation
-# # 10 fold cross validation
-# k <- 10
-# # Results from cv
-# outs <- NULL
-# # Train test split proportions
-# proportion <- 0.50 
+# library(neuralnet)
 # 
-# # Crossvalidate, go!
-# for(i in 1:k)
-# {
-#   index <- sample(1:nrow(final_subset_train), round(proportion*nrow(final_subset_train)))
-#   train_cv <- final_subset_train[index, ]
-#   index <- sample(1:nrow(final_subset_test), round(proportion*nrow(final_subset_test)))
-#   test_cv <- final_subset_test[index, ]
-#   nn_cv <- neuralnet(formula = f, data = train_cv, hidden = c(2,1), linear.output = FALSE, threshold = 0.01)
-#   
-#   # Compute predictions
-#   pr.nn <- compute(nn_cv, test_cv[, 1:19])
-#   # Extract results
-#   pr.nn_ <- pr.nn$net.result
-#   # Accuracy (test set)
-#   original_values <- max.col(test_cv[, 20:24])
-#   pr.nn_2 <- max.col(pr.nn_)
-#   outs[i] <- mean(pr.nn_2 == original_values)
-# }
+# n <- names(final_subset_train)
+# f <- as.formula(paste("normal + dos + probe + r2l + u2r ~", 
+#                       paste(n[!n %in% c("normal", "dos", "probe", "r2l", "u2r")], collapse = " + ")))
+# f
 # 
-# # accuracy of cv
-# mean(outs)
+# nnModel <- neuralnet(formula = f, data = final_subset_train, hidden = c(10, 5, 3, 2), linear.output = FALSE, threshold = 0.01, stepmax = 1e+07)
+# saveRDS(object = nnModel, file = "nnModel_on_100_test_set.rds")
+# #nnModel = readRDS("rfModelFitFile_on_50_test_set.rds")
+# nnModel$result.matrix
+# plot(nnModel)
+# 
+# 
+# 
+# 
+# 
+# 
+# # Compute predictions
+# pr.nn <- compute(nnModel, final_subset_test[, 1:19])
+# pr.nn
+# 
+# results <- data.frame(pr.nn$net.result)
+# names(results) = c("normal", "dos", "probe", "r2l", "u2r")
+# 
+# roundedresults <- sapply(results, round, digits = 0)
+# roundedresultsdf = data.frame(roundedresults)
+# 
+# predictedResults = cbind(1:nrow(roundedresultsdf), max.col(roundedresultsdf))
+# predictedResults = predictedResults[,2]
+# actualResults = cbind(1:nrow(final_subset_test[, 20:24]), max.col(final_subset_test[, 20:24]))
+# actualResults = actualResults[,2]
+# 
+# # confustion matrix
+# confusion_matrix = table(predictedResults, actualResults)
+# confusion_matrix
+# round(prop.table(confusion_matrix, 1) * 100, 2)
+# 
+# 
+# # accuracy on testing set
+# mean(predictedResults == actualResults)
+
+
+
+
+
+# cross validation
+# 10 fold cross validation
+k <- 10
+# Results from cv
+outs <- NULL
+# Train test split proportions
+proportion <- 0.50
+
+# Crossvalidate, go!
+for(i in 1:k)
+{
+  index <- sample(1:nrow(final_subset_train), round(proportion*nrow(final_subset_train)))
+  train_cv <- final_subset_train[index, ]
+  index <- sample(1:nrow(final_subset_test), round(proportion*nrow(final_subset_test)))
+  test_cv <- final_subset_test[index, ]
+  nn_cv <- neuralnet(formula = f, data = train_cv, hidden = c(10, 5, 2), linear.output = FALSE, threshold = 0.01, stepmax = 1e+07)
+
+  # Compute predictions
+  pr.nn <- compute(nn_cv, test_cv[, 1:19])
+  # Extract results
+  pr.nn_ <- pr.nn$net.result
+  # Accuracy (test set)
+  original_values <- max.col(test_cv[, 20:24])
+  pr.nn_2 <- max.col(pr.nn_)
+  outs[i] <- mean(pr.nn_2 == original_values)
+}
+
+# accuracy of cv
+mean(outs)
